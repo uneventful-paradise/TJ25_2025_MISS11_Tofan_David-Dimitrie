@@ -15,7 +15,8 @@ public class HelloServlet extends HttpServlet {
         message = "Hello World!";
     }
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        logData(request);
         response.setContentType("text/html");
 
         // Hello
@@ -40,7 +41,8 @@ public class HelloServlet extends HttpServlet {
         }
 
         response.setContentType("text/plain");
-        PrintWriter out = response.getWriter();
+        String response_contents = "received: " + page;
+        response.getWriter().write(response_contents);
 
         RequestDispatcher rd = request.getRequestDispatcher(destination);
         rd.forward(request, response);
@@ -52,16 +54,16 @@ public class HelloServlet extends HttpServlet {
         String http_method =  request.getMethod();
         String ip_address = request.getRemoteAddr();
         String user_agent = request.getHeader("User-Agent");
-        String client_language = request.getHeader("Client-Language");
+        String client_language = request.getHeader("Accept-Language");
         String parameter = request.getParameter("page");
 
-        log_msg.append(http_method).append("\n");
-        log_msg.append(ip_address).append("\n");
-        log_msg.append(user_agent).append("\n");
-        log_msg.append(client_language).append("\n");
-        log_msg.append(parameter).append("\n");
+        log_msg.append("method: ").append(http_method).append("\n");
+        log_msg.append("ip address: ").append(ip_address).append("\n");
+        log_msg.append("user agent: ").append(user_agent).append("\n");
+        log_msg.append("client language: ").append(client_language).append("\n");
+        log_msg.append("parameter: ").append(parameter).append("\n");
 
-        System.out.println(log_msg.toString());
+        System.out.println(log_msg);
     }
 
     public void destroy() {
