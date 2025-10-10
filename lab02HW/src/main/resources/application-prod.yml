@@ -1,0 +1,6 @@
+db:
+  host: ${DB_HOST:localhost}
+  port: ${DB_PORT:5433}
+  databaseName: ${DB_NAME:prod_db}
+  username: ${DB_USER:postgres}
+  password: ${DB_PASSWORD}

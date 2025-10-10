@@ -1,0 +1,22 @@
+server:
+  port: 8082
+spring:
+  # This line tells Spring Boot to look for a .env file
+  config:
+    import: "optional:file:.env[.properties]"
+  application:
+    name: lab02HW
+  profiles:
+    active: dev
+  sql:
+    init:
+      mode: always
+
+app:
+  greeting: "Hello from application.yml"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info
