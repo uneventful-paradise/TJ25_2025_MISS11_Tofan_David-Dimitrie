@@ -4,3 +4,9 @@ db:
   databaseName: ${DB_NAME:prod_db}
   username: ${DB_USER:postgres}
   password: ${DB_PASSWORD}
+app:
+  greeting: "Hello from prod"
+spring:
+  sql:
+    init:
+      mode: always

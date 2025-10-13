@@ -17,6 +17,8 @@ public class DataSourceConfig {
         return new EmbeddedDatabaseBuilder()
                 .setType(EmbeddedDatabaseType.H2)
                 .setName("devDB")
+                .addScript("classpath:schema-dev.sql")
+                .addScript("classpath:data-dev.sql")
                 .build();
     }
 
