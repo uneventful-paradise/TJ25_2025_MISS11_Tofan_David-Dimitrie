@@ -1,37 +1,28 @@
 package com.example.lab04;
 
 import jakarta.persistence.*;
+import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 @Entity
 @Table(name = "students")
-@Data //getters, setters, toString(), equals(), hashCode()
+@Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@AllArgsConstructor
-public class Student {
-
-    @Id //primary key
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Uses database auto-increment
-    private Long id;
+public class Student extends BaseUser {
 
     @Column(nullable = false, unique = true)
     private String code;
 
     @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false, unique = true)
-    private String email;
-
-    @Column(nullable = false)
     private Integer year;
 
     public Student(String code, String name, String email, Integer year) {
+        super(name, email);
         this.code = code;
-        this.name = name;
-        this.email = email;
         this.year = year;
     }
 }
