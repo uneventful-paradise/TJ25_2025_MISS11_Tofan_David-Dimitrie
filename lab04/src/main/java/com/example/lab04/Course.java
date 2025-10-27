@@ -2,11 +2,14 @@ package com.example.lab04;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "courses")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class Course {
 
@@ -48,5 +51,17 @@ public class Course {
         this.description = description;
         this.instructor = instructor;
         this.pack = pack;
+    }
+    @Override
+    public String toString() {
+        return "Course{" +
+                "id=" + id +
+                ", type=" + type +
+                ", code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                // Only print IDs to avoid loading the proxy
+                ", instructorId=" + (instructor != null ? instructor.getId() : "null") +
+                ", packId=" + (pack != null ? pack.getId() : "null") +
+                '}';
     }
 }
