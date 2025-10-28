@@ -59,7 +59,6 @@ public class Course {
                 ", type=" + type +
                 ", code='" + code + '\'' +
                 ", name='" + name + '\'' +
-                // Only print IDs to avoid loading the proxy
                 ", instructorId=" + (instructor != null ? instructor.getId() : "null") +
                 ", packId=" + (pack != null ? pack.getId() : "null") +
                 '}';

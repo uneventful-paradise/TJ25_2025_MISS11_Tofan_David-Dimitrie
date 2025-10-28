@@ -34,14 +34,12 @@ public class Lab04Application {
 
     @Transactional
     public void runDemo(CourseService courseService, InstructorService instructorService, PackService packService, StudentService studentService) {
-        log.info("\nSTARTING FAKER DEMO & CRUD TEST\n");
-
-        // Must delete in the correct order due to foreign keys
+        log.info("\nSTARTING DEMO\n");
         courseService.deleteAll();
         packService.deleteAll();
         instructorService.deleteAll();
         studentService.deleteAll();
-        log.info("Cleared all repositories.");
+        log.info("cleared repo info");
 
         Faker faker = new Faker(new Locale("en-US"));
 
@@ -53,19 +51,19 @@ public class Lab04Application {
                 faker.name().fullName(),
                 faker.internet().emailAddress()
         ));
-        log.info("Saved instructors: {} and {}", prof1.getName(), prof2.getName());
+        log.info("saved instructors: {} and {}", prof1.getName(), prof2.getName());
 
         Pack pack1 = packService.save(new Pack(3, 1, "Licenta An 3, Sem 1"));
-        log.info("Saved pack: {}", pack1.getName());
+        log.info("saved pack: {}", pack1.getName());
 
         String courseCode = "CS101";
 
-        log.info("--- CREATE ---");
+        log.info("TESTING CREATE OPERATION FOR COURSES");
         Course newCourse = new Course(
                 CourseType.compulsory,
                 courseCode,
-                "IntroCS",
-                "Introduction to Computer Science",
+                "IP",
+                "Ingineria Programarii",
                 4,
                 faker.lorem().sentence(),
                 prof1,
@@ -74,7 +72,7 @@ public class Lab04Application {
         courseService.save(newCourse);
         log.info("Created new course: {}", newCourse.getName());
 
-        log.info("--- READ ---");
+        log.info("TESTING READ OPERATION FOR COURSES");
         courseService.findById(newCourse.getId()).ifPresent(course ->
                 log.info("findById(1L): Found course: {}", course.toString())
         );
@@ -83,28 +81,24 @@ public class Lab04Application {
         List<Course> compulsoryCourses = courseService.findByType(CourseType.compulsory);
         log.info("findByType('compulsory'): Found {} courses.", compulsoryCourses.size());
 
-        // UPDATE
-        log.info("--- UPDATE ---");
-        String newDescription = "A new, updated description.";
+        log.info("TESTING UPDATE OPERATION FOR COURSES");
+        String newDescription = "Cel mai smecher curs.";
         int updatedRows = courseService.updateDescription(courseCode, newDescription);
-        log.info("updateDescription(): Updated {} rows.", updatedRows);
+        log.info("updateDescription: updated {} rows.", updatedRows);
 
-        // Verify the update
         courseService.findById(newCourse.getId()).ifPresent(course ->
                 log.info("Verified description: {}", course.getDescription())
         );
 
-        // DELETE
-        log.info("--- DELETE ---");
+        log.info("TESTING DELETE OPERATION FOR COURSES");
         courseService.deleteById(newCourse.getId());
         log.info("Deleted course. Remaining courses: {}", courseService.count());
 
-        // --- 3. Test JPQL Query ---
-        log.info("--- JPQL TEST ---");
-        log.info("Finding instructors with 'a' in their name:");
+        log.info("TESTING JPQL QUERY");
+        log.info("Instructors with 'a' in their name:");
         List<Instructor> instructors = instructorService.findByName("a");
         instructors.forEach(instructor -> log.info("Found: {}", instructor.getName()));
 
-        log.info("\nFAKER DEMO FINISHED\n");
+        log.info("\nDEMO FINISHED\n");
     }
 }

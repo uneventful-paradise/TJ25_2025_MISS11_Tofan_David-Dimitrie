@@ -8,10 +8,7 @@ import java.util.List;
 @Repository
 public interface InstructorRepository extends JpaRepository<Instructor, Long> {
 
-    /**
-     * Requirement: A query based on a specific JPQL string
-     * Finds all instructors whose names contain a given string (case-insensitive).
-     */
+    //jpql query
     @Query("SELECT i FROM Instructor i WHERE LOWER(i.name) LIKE LOWER(CONCAT('%', :name, '%'))")
     List<Instructor> findByNameContaining(String name);
 }

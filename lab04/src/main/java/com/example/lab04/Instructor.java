@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class Instructor extends BaseUser { // Extends the new base class
+public class Instructor extends BaseUser {
 
     @OneToMany(mappedBy = "instructor")
     private List<Course> courses = new ArrayList<>();

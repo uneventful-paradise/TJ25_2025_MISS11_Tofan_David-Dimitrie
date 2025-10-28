@@ -12,16 +12,10 @@ import java.util.List;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
-    /**
-     * Requirement: A DERIVED QUERY
-     * Finds all courses of a specific type.
-     */
+    //derived query
     List<Course> findByType(CourseType type);
 
-    /**
-     * Requirement: A TRANSACTIONAL, MODIFYING QUERY
-     * Updates a course's description based on its unique code.
-     */
+    //transactional modifying query
     @Transactional
     @Modifying
     @Query("UPDATE Course c SET c.description = :description WHERE c.code = :code")
