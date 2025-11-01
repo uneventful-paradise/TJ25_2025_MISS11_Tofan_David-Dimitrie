@@ -1,5 +1,6 @@
-package com.example.lab04;
+package com.example.lab04.repository;
 
+import com.example.lab04.Instructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

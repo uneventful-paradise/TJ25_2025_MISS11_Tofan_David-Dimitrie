@@ -1,5 +1,7 @@
-package com.example.lab04;
+package com.example.lab04.repository;
 
+import com.example.lab04.Course;
+import com.example.lab04.CourseType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

@@ -19,10 +19,15 @@ public class Student extends BaseUser {
 
     @Column(nullable = false)
     private Integer year;
+    //students now have associated packs
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pack_id")
+    private Pack pack;
 
-    public Student(String code, String name, String email, Integer year) {
+    public Student(String code, String name, String email, Integer year, Pack pack) {
         super(name, email);
         this.code = code;
         this.year = year;
+        this.pack = pack;
     }
 }
