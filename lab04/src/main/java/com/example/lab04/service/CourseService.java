@@ -23,7 +23,6 @@ public class CourseService {
     private final InstructorRepository instructorRepository;
     private final PackRepository packRepository;
 
-    // Update constructor
     public CourseService(CourseRepository courseRepository,
                          InstructorRepository instructorRepository,
                          PackRepository packRepository) {
@@ -38,14 +37,12 @@ public class CourseService {
 
     @Transactional
     public CourseResponseDto createCourse(CourseRequestDto dto) {
-        // 1. Find the related entities
         Instructor instructor = instructorRepository.findById(dto.getInstructorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Instructor not found with id: " + dto.getInstructorId()));
 
         Pack pack = packRepository.findById(dto.getPackId())
                 .orElseThrow(() -> new ResourceNotFoundException("Pack not found with id: " + dto.getPackId()));
 
-        // 2. Create the new Course entity
         Course course = new Course(
                 dto.getType(),
                 dto.getCode(),
@@ -57,12 +54,10 @@ public class CourseService {
                 pack
         );
 
-        // 3. Save and map to response
         Course savedCourse = courseRepository.save(course);
         return mapToResponseDto(savedCourse);
     }
 
-    // --- Helper DTO Mapper ---
     private CourseResponseDto mapToResponseDto(Course course) {
         CourseResponseDto dto = new CourseResponseDto();
         dto.setId(course.getId());
@@ -82,7 +77,7 @@ public class CourseService {
     @Transactional(readOnly = true)
     public List<CourseResponseDto> findAll() {
         return courseRepository.findAll().stream()
-                .map(this::mapToResponseDto) // You already have this helper
+                .map(this::mapToResponseDto)
                 .collect(Collectors.toList());
     }
 

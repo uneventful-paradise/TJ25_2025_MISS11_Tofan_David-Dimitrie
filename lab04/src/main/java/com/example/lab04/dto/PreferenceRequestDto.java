@@ -14,6 +14,6 @@ public class PreferenceRequestDto {
     private Long courseId;
 
     @NotNull(message = "Rank cannot be null")
-    @Min(value = 1, message = "Rank must be at least 1")
+    @Min(value = 1, message = "Rank >= 1")
     private Integer rank;
 }

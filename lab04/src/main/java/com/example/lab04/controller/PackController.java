@@ -24,9 +24,6 @@ public class PackController {
         return packService.save(pack);
     }
 
-    /**
-     * NEW method to get all
-     */
     @GetMapping
     public List<PackResponseDto> getAllPacks() {
         return packService.findAll();

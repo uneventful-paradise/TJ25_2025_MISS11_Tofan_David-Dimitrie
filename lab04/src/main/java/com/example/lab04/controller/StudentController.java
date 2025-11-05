@@ -29,8 +29,8 @@ public class StudentController {
     }
 
     @GetMapping
-    public List<Student> getAllStudents() {
-        return studentService.findAll();
+    public List<StudentResponseDto> getAllStudents() {
+        return studentService.findAllDto();
     }
 
 //    @GetMapping("/{id}")
@@ -42,8 +42,8 @@ public class StudentController {
             MediaType.APPLICATION_JSON_VALUE,
             MediaType.APPLICATION_XML_VALUE
     })
-    public Student getStudentById(@PathVariable Long id) {
-        return studentService.findById(id);
+    public StudentResponseDto getStudentById(@PathVariable Long id) {
+        return studentService.findByIdDto(id);
     }
 
     @PutMapping("/{id}")

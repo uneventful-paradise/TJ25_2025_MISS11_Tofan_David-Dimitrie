@@ -23,9 +23,6 @@ public class PackService {
         return mapToResponseDto(savedPack);
     }
 
-    /**
-     * NEW method to find all
-     */
     @Transactional(readOnly = true)
     public List<PackResponseDto> findAll() {
         return packRepository.findAll().stream()
@@ -33,7 +30,6 @@ public class PackService {
                 .collect(Collectors.toList());
     }
 
-    // --- Helper DTO Mapper ---
     private PackResponseDto mapToResponseDto(Pack pack) {
         PackResponseDto dto = new PackResponseDto();
         dto.setId(pack.getId());

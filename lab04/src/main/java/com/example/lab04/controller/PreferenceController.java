@@ -28,9 +28,6 @@ public class PreferenceController {
         this.preferenceService = preferenceService;
     }
 
-    /**
-     * Requirement 7: Document at least one endpoint with Springdoc OpenAPI
-     */
     @Operation(summary = "Create a new preference",
             description = "Submits a student's preference (rank) for a specific course. " +
                     "The course must be in the student's pack.",
@@ -45,26 +42,14 @@ public class PreferenceController {
         return preferenceService.createPreference(dto);
     }
 
-    /**
-     * Requirement 5: Conditional requests using ETag and If-None-Match
-     */
     @GetMapping("/{id}")
     public ResponseEntity<PreferenceResponseDto> getPreferenceById(
             @PathVariable Long id, WebRequest request) {
-
-        // 1. Get the entity. We need this to calculate the ETag.
         Preference preference = preferenceService.getPreferenceEntityById(id);
-
-        // 2. Calculate a simple ETag based on the object's hashCode.
         String etag = "\"" + preference.getId() + "-" + preference.getRank() + "\"";
-
-        // 3. Check If-None-Match header.
-        // If it matches our ETag, return 304 Not Modified.
         if (request.checkNotModified(etag)) {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).eTag(etag).build();
         }
-
-        // 4. If no match, return 200 OK with the full body and the ETag.
         PreferenceResponseDto dto = preferenceService.getPreferenceById(id);
         return ResponseEntity.ok().eTag(etag).body(dto);
     }

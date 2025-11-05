@@ -38,12 +38,9 @@ public class PreferenceService {
         Course course = courseRepository.findById(dto.getCourseId())
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + dto.getCourseId()));
 
-        // Validation: Check if course is in the student's pack
         if (student.getPack() == null || !course.getPack().getId().equals(student.getPack().getId())) {
             throw new IllegalArgumentException("Course is not in the student's year/pack.");
         }
-
-        // TODO: Add check for duplicate rank/course
 
         Preference preference = new Preference(student, course, dto.getRank());
         Preference savedPref = preferenceRepository.save(preference);
@@ -84,7 +81,7 @@ public class PreferenceService {
     @Transactional(readOnly = true)
     public List<PreferenceResponseDto> findAll() {
         return preferenceRepository.findAll().stream()
-                .map(this::mapToResponseDto) // You already have this helper
+                .map(this::mapToResponseDto)
                 .collect(Collectors.toList());
     }
 

@@ -23,9 +23,6 @@ public class InstructorService {
         return mapToResponseDto(savedInstructor);
     }
 
-    /**
-     * NEW method to find all
-     */
     @Transactional(readOnly = true)
     public List<InstructorResponseDto> findAll() {
         return instructorRepository.findAll().stream()
@@ -33,7 +30,6 @@ public class InstructorService {
                 .collect(Collectors.toList());
     }
 
-    // --- Helper DTO Mapper ---
     private InstructorResponseDto mapToResponseDto(Instructor instructor) {
         InstructorResponseDto dto = new InstructorResponseDto();
         dto.setId(instructor.getId());

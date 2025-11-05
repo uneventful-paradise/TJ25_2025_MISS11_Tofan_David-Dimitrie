@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,7 +28,18 @@ public class StudentService {
 //    public StudentService(StudentRepository studentRepository) {
 //        this.studentRepository = studentRepository;
 //    }
+    @Transactional(readOnly = true) // Good for read-only operations
+    public List<StudentResponseDto> findAllDto() {
+        return studentRepository.findAll().stream()
+                .map(this::mapToResponseDto) // Uses your existing helper
+                .collect(Collectors.toList());
+    }
 
+    @Transactional(readOnly = true)
+    public StudentResponseDto findByIdDto(Long id) {
+        Student student = findById(id); // Uses your existing findById
+        return mapToResponseDto(student);
+    }
     /**
      * MODIFIED 'save' METHOD TO RETURN THE DTO
      */
