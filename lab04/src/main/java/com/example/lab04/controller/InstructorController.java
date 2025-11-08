@@ -1,6 +1,5 @@
 package com.example.lab04.controller;
 
-import com.example.lab04.Instructor;
 import com.example.lab04.dto.InstructorResponseDto;
 import com.example.lab04.service.InstructorService;
 import org.springframework.http.HttpStatus;
@@ -16,12 +15,6 @@ public class InstructorController {
 
     public InstructorController(InstructorService instructorService) {
         this.instructorService = instructorService;
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public InstructorResponseDto createInstructor(@RequestBody Instructor instructor) {
-        return instructorService.save(instructor);
     }
 
     @GetMapping

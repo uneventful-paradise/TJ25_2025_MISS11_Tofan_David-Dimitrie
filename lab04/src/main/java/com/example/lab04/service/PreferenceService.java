@@ -90,7 +90,7 @@ public class PreferenceService {
         dto.setId(preference.getId());
         dto.setRank(preference.getRank());
         dto.setStudentId(preference.getStudent().getId());
-        dto.setStudentName(preference.getStudent().getName());
+        dto.setStudentName(preference.getStudent().getUser().getName());
         dto.setCourseId(preference.getCourse().getId());
         dto.setCourseName(preference.getCourse().getName());
         return dto;

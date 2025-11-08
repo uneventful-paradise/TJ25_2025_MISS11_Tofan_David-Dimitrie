@@ -36,13 +36,13 @@ public class Course {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "instructor_id")
-    private Instructor instructor;
+    private User instructor; // <-- Changed from Instructor to User
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pack_id")
     private Pack pack;
 
-    public Course(CourseType type, String code, String abbr, String name, Integer groupCount, String description, Instructor instructor, Pack pack) {
+    public Course(CourseType type, String code, String abbr, String name, Integer groupCount, String description, User instructor, Pack pack) {
         this.type = type;
         this.code = code;
         this.abbr = abbr;

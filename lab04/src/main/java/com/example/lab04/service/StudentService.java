@@ -1,13 +1,17 @@
 package com.example.lab04.service;
 
 import com.example.lab04.Pack;
+import com.example.lab04.Role;
 import com.example.lab04.Student;
+import com.example.lab04.User;
 import com.example.lab04.dto.StudentRequestDto;
 import com.example.lab04.dto.StudentResponseDto;
 import com.example.lab04.exception.ResourceNotFoundException;
 import com.example.lab04.repository.PackRepository;
 import com.example.lab04.repository.StudentRepository;
+import com.example.lab04.repository.UserRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -20,9 +24,16 @@ import org.springframework.web.server.ResponseStatusException;
 public class StudentService {
     private final StudentRepository studentRepository;
     private final PackRepository packRepository;
-    public StudentService(StudentRepository studentRepository, PackRepository packRepository) {
+    // FIX: Need UserRepository and PasswordEncoder to create the User
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public StudentService(StudentRepository studentRepository, PackRepository packRepository,
+                          UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.studentRepository = studentRepository;
         this.packRepository = packRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 //    public StudentService(StudentRepository studentRepository) {
@@ -40,39 +51,41 @@ public class StudentService {
         Student student = findById(id); // Uses your existing findById
         return mapToResponseDto(student);
     }
-    /**
-     * MODIFIED 'save' METHOD TO RETURN THE DTO
-     */
     @Transactional
     public StudentResponseDto save(StudentRequestDto dto) {
         Pack pack = packRepository.findById(dto.getPackId())
                 .orElseThrow(() -> new ResourceNotFoundException("Pack not found with id: " + dto.getPackId()));
 
-        Student student = new Student(
-                dto.getCode(),
-                dto.getName(),
+        // --- This is the logic you want ---
+        // 1. Create and save the new User
+        User newUser = new User(
                 dto.getEmail(),
+                passwordEncoder.encode(dto.getPassword()), // <-- Use the password from the DTO
+                dto.getName(),
+                Role.ROLE_STUDENT // This service only registers Students
+        );
+        User savedUser = userRepository.save(newUser);
+
+        // 2. Create and save the new Student profile
+        Student student = new Student(
+                savedUser,
+                dto.getCode(),
                 dto.getYear(),
                 pack
         );
-
-        // Save the new entity
         Student savedStudent = studentRepository.save(student);
 
-        // Map the entity to the DTO and return it
+        // 3. Return the clean DTO
         return mapToResponseDto(savedStudent);
     }
 
-    /**
-     * NEW HELPER METHOD
-     * Maps the internal Entity to the public DTO
-     */
     private StudentResponseDto mapToResponseDto(Student student) {
         StudentResponseDto dto = new StudentResponseDto();
         dto.setId(student.getId());
         dto.setCode(student.getCode());
-        dto.setName(student.getName());
-        dto.setEmail(student.getEmail());
+        // FIX: 'name' and 'email' are now on the User object
+        dto.setName(student.getUser().getName());
+        dto.setEmail(student.getUser().getEmail());
         dto.setYear(student.getYear());
         dto.setPackId(student.getPack().getId());
         dto.setPackName(student.getPack().getName());
@@ -104,8 +117,8 @@ public class StudentService {
 
         // 3. Update the fields on the existing, managed entity
         existingStudent.setCode(dto.getCode());
-        existingStudent.setName(dto.getName());
-        existingStudent.setEmail(dto.getEmail());
+        existingStudent.getUser().setName(dto.getName());
+        existingStudent.getUser().setEmail(dto.getEmail());
         existingStudent.setYear(dto.getYear());
         existingStudent.setPack(pack);
 

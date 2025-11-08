@@ -1,15 +1,13 @@
 package com.example.lab04.service;
 
-import com.example.lab04.Course;
-import com.example.lab04.Instructor;
-import com.example.lab04.Pack;
+import com.example.lab04.*;
 import com.example.lab04.dto.CourseRequestDto;
 import com.example.lab04.dto.CourseResponseDto;
 import com.example.lab04.exception.ResourceNotFoundException;
 import com.example.lab04.repository.CourseRepository;
-import com.example.lab04.CourseType;
-import com.example.lab04.repository.InstructorRepository;
 import com.example.lab04.repository.PackRepository;
+import com.example.lab04.repository.UserRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,14 +18,14 @@ import java.util.stream.Collectors;
 @Service
 public class CourseService {
     private final CourseRepository courseRepository;
-    private final InstructorRepository instructorRepository;
+    private final UserRepository userRepository;
     private final PackRepository packRepository;
 
     public CourseService(CourseRepository courseRepository,
-                         InstructorRepository instructorRepository,
+                         UserRepository userRepository,
                          PackRepository packRepository) {
         this.courseRepository = courseRepository;
-        this.instructorRepository = instructorRepository;
+        this.userRepository = userRepository;
         this.packRepository = packRepository;
     }
 
@@ -35,10 +33,16 @@ public class CourseService {
 //        this.courseRepository = courseRepository;
 //    }
 
+    /**
+     * This method can only be called by an ADMIN or an INSTRUCTOR.
+     * This check is now redundant because it's also in SecurityConfig,
+     * but it demonstrates how to do it at the method level.
+     */
+    @PreAuthorize("hasRole('ADMIN') or hasRole('INSTRUCTOR')")
     @Transactional
     public CourseResponseDto createCourse(CourseRequestDto dto) {
-        Instructor instructor = instructorRepository.findById(dto.getInstructorId())
-                .orElseThrow(() -> new ResourceNotFoundException("Instructor not found with id: " + dto.getInstructorId()));
+        User instructor = userRepository.findById(dto.getInstructorId())
+                .orElseThrow(() -> new ResourceNotFoundException("Instructor (User) not found with id: " + dto.getInstructorId()));
 
         Pack pack = packRepository.findById(dto.getPackId())
                 .orElseThrow(() -> new ResourceNotFoundException("Pack not found with id: " + dto.getPackId()));

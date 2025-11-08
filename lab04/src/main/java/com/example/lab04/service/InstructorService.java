@@ -1,8 +1,9 @@
 package com.example.lab04.service;
 
-import com.example.lab04.Instructor;
+import com.example.lab04.Role;
+import com.example.lab04.User;
 import com.example.lab04.dto.InstructorResponseDto;
-import com.example.lab04.repository.InstructorRepository;
+import com.example.lab04.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,38 +12,29 @@ import java.util.stream.Collectors;
 
 @Service
 public class InstructorService {
-    private final InstructorRepository instructorRepository;
+    private final UserRepository userRepository;
 
-    public InstructorService(InstructorRepository instructorRepository) {
-        this.instructorRepository = instructorRepository;
-    }
-
-    @Transactional
-    public InstructorResponseDto save(Instructor instructor) {
-        Instructor savedInstructor = instructorRepository.save(instructor);
-        return mapToResponseDto(savedInstructor);
+    public InstructorService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Transactional(readOnly = true)
     public List<InstructorResponseDto> findAll() {
-        return instructorRepository.findAll().stream()
+        // FIX: Find all users who have the ROLE_INSTRUCTOR
+        return userRepository.findAllByRole(Role.ROLE_INSTRUCTOR).stream()
                 .map(this::mapToResponseDto)
                 .collect(Collectors.toList());
     }
 
-    private InstructorResponseDto mapToResponseDto(Instructor instructor) {
+    private InstructorResponseDto mapToResponseDto(User user) {
         InstructorResponseDto dto = new InstructorResponseDto();
-        dto.setId(instructor.getId());
-        dto.setName(instructor.getName());
-        dto.setEmail(instructor.getEmail());
+        dto.setId(user.getId());
+        dto.setName(user.getName()); // <-- 'getName()' is on User
+        dto.setEmail(user.getEmail()); // <-- 'getEmail()' is on User
         return dto;
     }
 
-    public List<Instructor> findByName(String name) {
-        return instructorRepository.findByNameContaining(name);
-    }
-
     public void deleteAll() {
-        instructorRepository.deleteAll();
+        userRepository.deleteAll();
     }
 }
