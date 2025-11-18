@@ -1,12 +1,8 @@
-# Development-specific properties
 spring:
   sql:
     init:
-      # This mode automatically runs scripts for embedded databases like H2
       mode: embedded
 
-# Dummy properties to satisfy validation for the DataSourceProperties bean
-# These values are NOT used for the actual H2 connection.
 db:
   host: "h2-dummy-host"
   port: 1234

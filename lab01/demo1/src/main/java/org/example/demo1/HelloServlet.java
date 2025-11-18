@@ -39,14 +39,18 @@ public class HelloServlet extends HttpServlet {
         } else {
             destination = "/index.jsp";
         }
+        String desktop_request = request.getParameter("desktop_request");
+        boolean plain_response = desktop_request != null && desktop_request.equals("true");
 
-        response.setContentType("text/plain");
-        String response_contents = "received: " + page;
-        response.getWriter().write(response_contents);
+        if (plain_response) {
+            response.setContentType("text/plain");
+            String response_contents = "received: " + page;
+            response.getWriter().write(response_contents);
 
-        RequestDispatcher rd = request.getRequestDispatcher(destination);
-        rd.forward(request, response);
-
+        } else {
+            RequestDispatcher rd = request.getRequestDispatcher(destination);
+            rd.forward(request, response);
+        }
     }
 
     public void logData(HttpServletRequest request) throws ServletException, IOException {

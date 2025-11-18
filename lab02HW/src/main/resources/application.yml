@@ -1,7 +1,6 @@
 server:
   port: 8082
 spring:
-  # This line tells Spring Boot to look for a .env file
   config:
     import: "optional:file:.env[.properties]"
   application:
@@ -24,7 +23,5 @@ management:
 
 logging:
   level:
-    # This package logs the execution of schema.sql and data.sql
     org.springframework.jdbc.datasource.init: DEBUG
-    # This package logs the high-level initialization process
     org.springframework.boot.sql.init: DEBUG

@@ -26,11 +26,11 @@ public class DatabaseVerificationRunner implements CommandLineRunner {
         );
 
         System.out.println("\n\n\n");
-        System.out.println(" Application Started Successfully!");
+        System.out.println("Am pornit sefu!");
         System.out.println(" ");
-        System.out.println("Active Profile: " + activeProfile.toUpperCase());
-        System.out.println("Greeting Message: '" + greetingMessage + "' (Demonstrates property precedence)");
-        System.out.println("DB Value for 'environment.name': " + envName);
+        System.out.println("Active Profile: " + activeProfile);
+        System.out.println("Greeting Message: '" + greetingMessage);
+//        System.out.println("DB Value for 'environment.name': " + envName);
         System.out.println("\n\n\n");
 
 //        try {

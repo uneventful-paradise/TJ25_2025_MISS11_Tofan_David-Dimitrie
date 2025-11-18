@@ -10,12 +10,14 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
     //derived query
     List<Course> findByType(CourseType type);
+    Optional<Course> findByCode(String code);
 
     //transactional modifying query
     @Transactional

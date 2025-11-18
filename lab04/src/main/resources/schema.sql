@@ -1,4 +1,4 @@
--- Drop in reverse order
+DROP TABLE IF EXISTS grades;
 DROP TABLE IF EXISTS preferences;
 DROP TABLE IF EXISTS courses;
 DROP TABLE IF EXISTS students;
@@ -81,4 +81,16 @@ CREATE TABLE preferences (
 
                              CONSTRAINT uk_student_course UNIQUE (student_id, course_id),
                              CONSTRAINT uk_student_rank UNIQUE (student_id, rank)
+);
+
+CREATE TABLE grades (
+                        id BIGSERIAL PRIMARY KEY,
+                        student_id BIGINT NOT NULL,
+                        course_id BIGINT NOT NULL,
+                        value DOUBLE PRECISION NOT NULL,
+
+                        CONSTRAINT fk_grade_student FOREIGN KEY(student_id) REFERENCES students(id) ON DELETE CASCADE,
+                        CONSTRAINT fk_grade_course FOREIGN KEY(course_id) REFERENCES courses(id) ON DELETE CASCADE
+    -- Ensure one grade per student per course
+--                         CONSTRAINT uk_grade_student_course UNIQUE (student_id, course_id)
 );

@@ -15,9 +15,18 @@ public class RabbitMQConfig {
     public static final String EXCHANGE = "grades_exchange";
     public static final String ROUTING_KEY = "grades_routingKey";
 
+    // DLQ Constants
+    public static final String DLQ_QUEUE = "grades_queue.dlq";
+    public static final String DLQ_EXCHANGE = "grades_exchange.dlq";
+    public static final String DLQ_ROUTING_KEY = "grades_dlk";
+
+    // --- Main Queue Configuration with DLQ Arguments ---
     @Bean
     public Queue queue() {
-        return new Queue(QUEUE);
+        return QueueBuilder.durable(QUEUE)
+                .withArgument("x-dead-letter-exchange", DLQ_EXCHANGE)
+                .withArgument("x-dead-letter-routing-key", DLQ_ROUTING_KEY)
+                .build();
     }
 
     @Bean
@@ -30,6 +39,23 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY);
     }
 
+    // --- Dead Letter Queue Configuration ---
+    @Bean
+    public Queue dlq() {
+        return new Queue(DLQ_QUEUE);
+    }
+
+    @Bean
+    public TopicExchange dlqExchange() {
+        return new TopicExchange(DLQ_EXCHANGE);
+    }
+
+    @Bean
+    public Binding dlqBinding() {
+        return BindingBuilder.bind(dlq()).to(dlqExchange()).with(DLQ_ROUTING_KEY);
+    }
+
+    // --- Converters & Template (Same as before) ---
     @Bean
     public MessageConverter converter() {
         return new Jackson2JsonMessageConverter();
