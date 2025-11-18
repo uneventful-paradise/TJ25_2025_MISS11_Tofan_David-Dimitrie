@@ -48,26 +48,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Disable CSRF (for stateless APIs)
+                // 1. Disable CSRF
                 .csrf(AbstractHttpConfigurer::disable)
 
-                // 2. Make the API stateless (no sessions)
+                // 2. Make API stateless
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // 3. Define authorization rules
+                // 3. Define NEW authorization rules
                 .authorizeHttpRequests(auth -> auth
-                        // Allow public access to login, register, and Swagger/Actuator
+                        // --- Public Endpoints (Always allowed) ---
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
 
-                        // --- Role-Based Access ---
-                        // Keep GET requests public
-                        .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
-
-                        // Secure POST/PUT/DELETE
+                        // --- Secure WRITE Endpoints (Roles required) ---
                         .requestMatchers(HttpMethod.POST, "/api/students/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/students/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/students/**").hasRole("ADMIN")
@@ -76,19 +72,28 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/courses/**").hasAnyRole("ADMIN", "INSTRUCTOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/courses/**").hasAnyRole("ADMIN", "INSTRUCTOR")
 
+                        .requestMatchers(HttpMethod.POST, "/api/packs/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/packs/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/packs/**").hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.POST, "/api/preferences/**").hasRole("STUDENT")
                         .requestMatchers(HttpMethod.PUT, "/api/preferences/**").hasRole("STUDENT")
                         .requestMatchers(HttpMethod.DELETE, "/api/preferences/**").hasRole("STUDENT")
 
-                        // Secure Actuator metrics
+                        // --- Secure sensitive READ/other Endpoints ---
                         .requestMatchers("/actuator/metrics").hasRole("ADMIN")
-                        .requestMatchers("/actuator/**").authenticated() // Secure all other actuator endpoints
+                        .requestMatchers("/actuator/**").authenticated()
 
-                        // All other requests must be authenticated
-                        .anyRequest().authenticated()
+                        // --- NEW RULE: Permit all other GET requests ---
+                        // This allows GET /api/** AND lets GET /users proceed to the 404 page
+                        .requestMatchers(HttpMethod.GET).permitAll()
+
+                        // --- NEW CATCH-ALL: Deny any other request ---
+                        // (e.g., POST /users, POST /some-random-url)
+                        .anyRequest().denyAll()
                 );
 
-        // 4. Add the JWT filter before the standard authentication filter
+        // 4. Add the JWT filter (this part is unchanged)
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
