@@ -34,19 +34,16 @@ public class GradeListener {
     public void consumeMessage(GradeMessage message) {
         log.info("Processing grade for student: {}", message.getStudentCode());
 
-        // 1. DLQ Testing Logic: Throw exception for invalid grades
         if (message.getGrade() < 1 || message.getGrade() > 10) {
             throw new IllegalArgumentException("Invalid grade value: " + message.getGrade());
         }
 
-        // 2. Find Entities
         Student student = studentRepository.findByCode(message.getStudentCode())
                 .orElseThrow(() -> new RuntimeException("Student not found: " + message.getStudentCode()));
 
-        Course course = courseRepository.findByCode(message.getCourseCode()) // You need to add findByCode to CourseRepo
+        Course course = courseRepository.findByCode(message.getCourseCode())
                 .orElseThrow(() -> new RuntimeException("Course not found: " + message.getCourseCode()));
 
-        // 3. Business Rule: Only Compulsory Courses
         if (course.getType() == CourseType.compulsory) {
             Grade grade = new Grade(student, course, message.getGrade());
             gradeRepository.save(grade);

@@ -30,12 +30,12 @@ public class AuthController {
 
     public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository,
                           PasswordEncoder passwordEncoder, JwtTokenProvider tokenProvider,
-                          StudentService studentService) { // <-- Update constructor
+                          StudentService studentService) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;
-        this.studentService = studentService; // <-- Add this
+        this.studentService = studentService;
     }
 
     @PostMapping("/login")
@@ -69,20 +69,17 @@ public class AuthController {
 
         userRepository.save(user);
 
-        // TODO: If role is STUDENT, you should also create a new Student entity
-        // linking to this user. This is an important next step.
+        //TODO:create new student entity
 
         return new ResponseEntity<>("User registered successfully", HttpStatus.CREATED);
     }
 
     @PostMapping("/register/student")
     public ResponseEntity<StudentResponseDto> registerStudent(@Valid @RequestBody StudentRequestDto registerRequest) {
-        // Check if email is in use
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST); // Or return a proper error object
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
 
-        // Call the service that does all the work
         StudentResponseDto newStudent = studentService.save(registerRequest);
         return new ResponseEntity<>(newStudent, HttpStatus.CREATED);
     }

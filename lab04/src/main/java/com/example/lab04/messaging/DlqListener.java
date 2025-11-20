@@ -14,6 +14,5 @@ public class DlqListener {
     @RabbitListener(queues = RabbitMQConfig.DLQ_QUEUE)
     public void processFailedMessage(GradeMessage failedMessage) {
         log.error("MESSAGE SENT TO DLQ (Processing Failed): {}", failedMessage);
-        // Here you could save to a 'failed_jobs' table or send an alert email
     }
 }

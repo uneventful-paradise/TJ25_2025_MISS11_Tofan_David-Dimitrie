@@ -33,11 +33,6 @@ public class CourseService {
 //        this.courseRepository = courseRepository;
 //    }
 
-    /**
-     * This method can only be called by an ADMIN or an INSTRUCTOR.
-     * This check is now redundant because it's also in SecurityConfig,
-     * but it demonstrates how to do it at the method level.
-     */
     @PreAuthorize("hasRole('ADMIN') or hasRole('INSTRUCTOR')")
     @Transactional
     public CourseResponseDto createCourse(CourseRequestDto dto) {

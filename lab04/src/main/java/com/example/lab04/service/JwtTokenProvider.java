@@ -14,7 +14,6 @@ import java.util.Date;
 @Service
 public class JwtTokenProvider {
 
-    // You MUST set this in application.properties
     @Value("${app.jwt.secret}")
     private String jwtSecret;
 

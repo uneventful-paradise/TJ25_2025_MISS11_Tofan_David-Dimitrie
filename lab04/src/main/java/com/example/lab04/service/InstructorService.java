@@ -20,7 +20,6 @@ public class InstructorService {
 
     @Transactional(readOnly = true)
     public List<InstructorResponseDto> findAll() {
-        // FIX: Find all users who have the ROLE_INSTRUCTOR
         return userRepository.findAllByRole(Role.ROLE_INSTRUCTOR).stream()
                 .map(this::mapToResponseDto)
                 .collect(Collectors.toList());
@@ -29,8 +28,8 @@ public class InstructorService {
     private InstructorResponseDto mapToResponseDto(User user) {
         InstructorResponseDto dto = new InstructorResponseDto();
         dto.setId(user.getId());
-        dto.setName(user.getName()); // <-- 'getName()' is on User
-        dto.setEmail(user.getEmail()); // <-- 'getEmail()' is on User
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
         return dto;
     }
 

@@ -39,7 +39,6 @@ public class GradeController {
                 .collect(Collectors.toList());
     }
 
-    // 2. Get grades for a specific student
     @GetMapping("/student/{code}")
     public List<GradeResponseDto> getStudentGrades(@PathVariable String code) {
         return gradeRepository.findByStudent_Code(code).stream()
@@ -47,18 +46,16 @@ public class GradeController {
                 .collect(Collectors.toList());
     }
 
-    // Helper method to map Entity -> DTO
     private GradeResponseDto mapToDto(Grade grade) {
         GradeResponseDto dto = new GradeResponseDto();
         dto.setId(grade.getId());
-        dto.setStudentName(grade.getStudent().getUser().getName()); // Access name via User
+        dto.setStudentName(grade.getStudent().getUser().getName());
         dto.setCourseName(grade.getCourse().getName());
         dto.setValue(grade.getValue());
         return dto;
     }
 
-    // 3. Upload CSV
-    // CSV Format: student_code,course_code,grade
+    //upload csv: student_code,course_code,grade
     @PostMapping("/upload")
     public ResponseEntity<String> uploadGrades(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
@@ -76,7 +73,6 @@ public class GradeController {
                 String cCode = data[1].trim();
                 Double val = Double.parseDouble(data[2].trim());
 
-                // Ideally, move this logic to a Service to avoid duplication with the Listener
                 studentRepository.findByCode(sCode).ifPresent(student -> {
                     courseRepository.findByCode(cCode).ifPresent(course -> {
                         if (course.getType() == CourseType.compulsory) {

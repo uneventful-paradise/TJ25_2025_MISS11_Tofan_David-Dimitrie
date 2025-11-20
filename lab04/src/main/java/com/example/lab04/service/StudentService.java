@@ -24,7 +24,6 @@ import org.springframework.web.server.ResponseStatusException;
 public class StudentService {
     private final StudentRepository studentRepository;
     private final PackRepository packRepository;
-    // FIX: Need UserRepository and PasswordEncoder to create the User
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -39,16 +38,16 @@ public class StudentService {
 //    public StudentService(StudentRepository studentRepository) {
 //        this.studentRepository = studentRepository;
 //    }
-    @Transactional(readOnly = true) // Good for read-only operations
+    @Transactional(readOnly = true)
     public List<StudentResponseDto> findAllDto() {
         return studentRepository.findAll().stream()
-                .map(this::mapToResponseDto) // Uses your existing helper
+                .map(this::mapToResponseDto)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public StudentResponseDto findByIdDto(Long id) {
-        Student student = findById(id); // Uses your existing findById
+        Student student = findById(id);
         return mapToResponseDto(student);
     }
     @Transactional
@@ -56,17 +55,14 @@ public class StudentService {
         Pack pack = packRepository.findById(dto.getPackId())
                 .orElseThrow(() -> new ResourceNotFoundException("Pack not found with id: " + dto.getPackId()));
 
-        // --- This is the logic you want ---
-        // 1. Create and save the new User
         User newUser = new User(
                 dto.getEmail(),
-                passwordEncoder.encode(dto.getPassword()), // <-- Use the password from the DTO
+                passwordEncoder.encode(dto.getPassword()),
                 dto.getName(),
-                Role.ROLE_STUDENT // This service only registers Students
+                Role.ROLE_STUDENT
         );
         User savedUser = userRepository.save(newUser);
 
-        // 2. Create and save the new Student profile
         Student student = new Student(
                 savedUser,
                 dto.getCode(),
@@ -75,7 +71,6 @@ public class StudentService {
         );
         Student savedStudent = studentRepository.save(student);
 
-        // 3. Return the clean DTO
         return mapToResponseDto(savedStudent);
     }
 
@@ -83,7 +78,6 @@ public class StudentService {
         StudentResponseDto dto = new StudentResponseDto();
         dto.setId(student.getId());
         dto.setCode(student.getCode());
-        // FIX: 'name' and 'email' are now on the User object
         dto.setName(student.getUser().getName());
         dto.setEmail(student.getUser().getEmail());
         dto.setYear(student.getYear());
@@ -107,25 +101,20 @@ public class StudentService {
 
     @Transactional
     public StudentResponseDto update(Long id, StudentRequestDto dto) {
-        // 1. Find the existing student
         Student existingStudent = studentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + id));
 
-        // 2. Find the new Pack (if it changed)
         Pack pack = packRepository.findById(dto.getPackId())
                 .orElseThrow(() -> new ResourceNotFoundException("Pack not found with id: " + dto.getPackId()));
 
-        // 3. Update the fields on the existing, managed entity
         existingStudent.setCode(dto.getCode());
         existingStudent.getUser().setName(dto.getName());
         existingStudent.getUser().setEmail(dto.getEmail());
         existingStudent.setYear(dto.getYear());
         existingStudent.setPack(pack);
 
-        // 4. Save the changes
         Student updatedStudent = studentRepository.save(existingStudent);
 
-        // 5. Map to the DTO and return
         return mapToResponseDto(updatedStudent);
     }
 

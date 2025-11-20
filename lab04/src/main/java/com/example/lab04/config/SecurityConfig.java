@@ -17,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-// This new annotation enables @PreAuthorize
+//annotation for preauthorize
 @EnableMethodSecurity
 @Configuration
 @EnableWebSecurity
@@ -26,17 +26,15 @@ public class SecurityConfig {
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
-    // This is the new JWT Auth Filter you will create in the next step
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    // Bean for BCrypt
+    //bean for bcrypt
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // Bean for AuthenticationManager (needed for /login)
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
@@ -48,22 +46,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Disable CSRF
+                //cross-site referencing
                 .csrf(AbstractHttpConfigurer::disable)
 
-                // 2. Make API stateless
+                //state,ess api
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // 3. Define NEW authorization rules
+                //authorization rules
                 .authorizeHttpRequests(auth -> auth
-                        // --- Public Endpoints (Always allowed) ---
+                        //public endpoitns
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
 
-                        // --- Secure WRITE Endpoints (Roles required) ---
                         .requestMatchers(HttpMethod.POST, "/api/students/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/students/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/students/**").hasRole("ADMIN")
@@ -81,20 +78,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/preferences/**").hasRole("STUDENT")
                         .requestMatchers(HttpMethod.DELETE, "/api/preferences/**").hasRole("STUDENT")
 
-                        // --- Secure sensitive READ/other Endpoints ---
                         .requestMatchers("/actuator/metrics").hasRole("ADMIN")
                         .requestMatchers("/actuator/**").authenticated()
 
-                        // --- NEW RULE: Permit all other GET requests ---
-                        // This allows GET /api/** AND lets GET /users proceed to the 404 page
                         .requestMatchers(HttpMethod.GET).permitAll()
 
-                        // --- NEW CATCH-ALL: Deny any other request ---
-                        // (e.g., POST /users, POST /some-random-url)
                         .anyRequest().denyAll()
                 );
 
-        // 4. Add the JWT filter (this part is unchanged)
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
