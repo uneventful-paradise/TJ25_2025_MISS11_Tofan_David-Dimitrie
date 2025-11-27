@@ -69,7 +69,7 @@ public class AuthController {
 
         userRepository.save(user);
 
-        //TODO:create new student entity
+        //TODO:create new student entity?
 
         return new ResponseEntity<>("User registered successfully", HttpStatus.CREATED);
     }

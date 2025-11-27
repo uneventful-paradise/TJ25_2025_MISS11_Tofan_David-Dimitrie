@@ -46,7 +46,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                //cross-site referencing
+                //cross-site request forgery
                 .csrf(AbstractHttpConfigurer::disable)
 
                 //state,ess api
@@ -69,6 +69,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/courses/**").hasAnyRole("ADMIN", "INSTRUCTOR")
                         .requestMatchers(HttpMethod.PUT, "/api/courses/**").hasAnyRole("ADMIN", "INSTRUCTOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/courses/**").hasAnyRole("ADMIN", "INSTRUCTOR")
+
+                        .requestMatchers(HttpMethod.POST, "/api/instructor-preferences/**").hasAnyRole("ADMIN", "INSTRUCTOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/instructor-preferences/**").hasAnyRole("ADMIN", "INSTRUCTOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/instructor-preferences/**").hasAnyRole("ADMIN", "INSTRUCTOR")
+
+//                        .requestMatchers(HttpMethod.POST, "/api/matching/**").hasAnyRole("ADMIN", "INSTRUCTOR")
+//                        .requestMatchers(HttpMethod.PUT, "/api/matching/**").hasAnyRole("ADMIN", "INSTRUCTOR")
+//                        .requestMatchers(HttpMethod.DELETE, "/api/matching/**").hasAnyRole("ADMIN", "INSTRUCTOR")
+                        .requestMatchers("/api/matching/**").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/packs/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/packs/**").hasRole("ADMIN")

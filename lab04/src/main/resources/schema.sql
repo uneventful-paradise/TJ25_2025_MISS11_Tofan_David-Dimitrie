@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS grades;
+DROP TABLE IF EXISTS instructor_preferences;
 DROP TABLE IF EXISTS preferences;
 DROP TABLE IF EXISTS courses;
 DROP TABLE IF EXISTS students;
@@ -92,4 +93,17 @@ CREATE TABLE grades (
                         CONSTRAINT fk_grade_course FOREIGN KEY(course_id) REFERENCES courses(id) ON DELETE CASCADE
     -- one grade per student per course
 --                         CONSTRAINT uk_grade_student_course UNIQUE (student_id, course_id)
+);
+
+CREATE TABLE instructor_preferences (
+                                        id BIGSERIAL PRIMARY KEY,
+                                        optional_course_id BIGINT NOT NULL,
+                                        compulsory_course_id BIGINT NOT NULL,
+                                        percentage DOUBLE PRECISION NOT NULL CHECK (percentage > 0 AND percentage <= 100),
+
+                                        CONSTRAINT fk_ip_optional FOREIGN KEY(optional_course_id) REFERENCES courses(id) ON DELETE CASCADE,
+                                        CONSTRAINT fk_ip_compulsory FOREIGN KEY(compulsory_course_id) REFERENCES courses(id) ON DELETE CASCADE,
+
+    -- An optional course can only have one weight for a specific compulsory course
+                                        CONSTRAINT uk_ip_courses UNIQUE (optional_course_id, compulsory_course_id)
 );

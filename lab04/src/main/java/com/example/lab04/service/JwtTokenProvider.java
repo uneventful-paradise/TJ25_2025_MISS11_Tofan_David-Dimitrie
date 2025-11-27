@@ -54,7 +54,7 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token);
             return true;
         } catch (Exception ex) {
-            // Log the error
+            //log error
         }
         return false;
     }
