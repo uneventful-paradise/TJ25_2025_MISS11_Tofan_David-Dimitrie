@@ -16,7 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
+import jakarta.servlet.DispatcherType;
 //annotation for preauthorize
 @EnableMethodSecurity
 @Configuration
@@ -49,14 +49,15 @@ public class SecurityConfig {
                 //cross-site request forgery
                 .csrf(AbstractHttpConfigurer::disable)
 
-                //state,ess api
+                //stateless api
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
                 //authorization rules
                 .authorizeHttpRequests(auth -> auth
-                        //public endpoitns
+                        .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
+                        //public endpoints
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
@@ -74,10 +75,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/instructor-preferences/**").hasAnyRole("ADMIN", "INSTRUCTOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/instructor-preferences/**").hasAnyRole("ADMIN", "INSTRUCTOR")
 
-//                        .requestMatchers(HttpMethod.POST, "/api/matching/**").hasAnyRole("ADMIN", "INSTRUCTOR")
-//                        .requestMatchers(HttpMethod.PUT, "/api/matching/**").hasAnyRole("ADMIN", "INSTRUCTOR")
-//                        .requestMatchers(HttpMethod.DELETE, "/api/matching/**").hasAnyRole("ADMIN", "INSTRUCTOR")
-                        .requestMatchers("/api/matching/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/matching/**").hasAnyRole("ADMIN", "INSTRUCTOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/matching/**").hasAnyRole("ADMIN", "INSTRUCTOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/matching/**").hasAnyRole("ADMIN", "INSTRUCTOR")
+//                        .requestMatchers("/api/matching/**").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/packs/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/packs/**").hasRole("ADMIN")

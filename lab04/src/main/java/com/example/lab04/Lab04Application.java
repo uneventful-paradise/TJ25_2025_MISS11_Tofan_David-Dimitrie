@@ -17,7 +17,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-
+import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.List;
 import java.util.Locale;
 
@@ -28,6 +28,7 @@ public class Lab04Application {
     private static final Logger log = LoggerFactory.getLogger(Lab04Application.class);
 
     public static void main(String[] args) {
+//        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
         SpringApplication.run(Lab04Application.class, args);
     }
 

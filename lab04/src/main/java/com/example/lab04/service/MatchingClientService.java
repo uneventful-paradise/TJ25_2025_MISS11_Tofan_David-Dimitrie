@@ -29,6 +29,7 @@ public class MatchingClientService {
     private final GradeRepository gradeRepository;
     private final InstructorPreferenceRepository instructorPreferenceRepository;
     private final RestTemplate restTemplate;
+    private final AssignmentRepository assignmentRepository;
 
     @Retry(name = "matchingService")
     @CircuitBreaker(name = "matchingService")
@@ -38,7 +39,7 @@ public class MatchingClientService {
 
         List<Student> students = studentRepository.findAll().stream()
                 .filter(s -> s.getPack().getId().equals(packId))
-                .peek(s -> s.getUser().getName()) // <--- FORCE INITIALIZATION of User proxy
+                .peek(s -> s.getUser().getName())
                 .collect(Collectors.toList());
 
         List<Course> courses = courseRepository.findAll().stream()
@@ -66,15 +67,42 @@ public class MatchingClientService {
         return CompletableFuture.supplyAsync(() -> {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-
             HttpEntity<SolverRequestDto> entity = new HttpEntity<>(request, headers);
 
             String url = "http://localhost:8084/api/solver/match/random";
-            log.info("Sending request to StableMatch: {} students, {} courses", studentDtos.size(), courseDtos.size());
-
+            log.info("Sending request to StableMatch...");
             SolverResponseDto[] response = restTemplate.postForObject(url, entity, SolverResponseDto[].class);
-            return response != null ? Arrays.asList(response) : Collections.emptyList();
+
+            List<SolverResponseDto> results = response != null ? Arrays.asList(response) : Collections.emptyList();
+
+            if (!results.isEmpty()) {
+                saveAssignmentsToDatabase(results);
+            }
+
+            return results;
         });
+    }
+
+    private void saveAssignmentsToDatabase(List<SolverResponseDto> results) {
+        log.info("Saving {} assignments to database...", results.size());
+
+         assignmentRepository.deleteAll();
+
+        for (SolverResponseDto dto : results) {
+            Student student = studentRepository.getReferenceById(dto.getStudentId());
+            Course course = courseRepository.getReferenceById(dto.getCourseId());
+
+            Assignment assignment = new Assignment(student, course);
+
+            Optional<Assignment> existing = assignmentRepository.findByStudent_Id(dto.getStudentId());
+            if (existing.isPresent()) {
+                existing.get().setCourse(course);
+                assignmentRepository.save(existing.get());
+            } else {
+                assignmentRepository.save(assignment);
+            }
+        }
+        log.info("Assignments saved successfully.");
     }
 
     private List<Long> calculateStudentRankingsForCourse(Course optionalCourse, List<Student> allStudents) {

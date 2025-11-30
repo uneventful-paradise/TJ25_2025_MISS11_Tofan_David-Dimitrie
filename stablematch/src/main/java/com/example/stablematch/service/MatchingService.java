@@ -50,18 +50,15 @@ public class MatchingService {
         System.out.println("Received request: " + request.getStudents().size() + " students.");
         List<MatchingResponseDto> results = new ArrayList<>();
 
-        // 1. FIX: Actually populate the map!
         Map<Long, Integer> capacities = new HashMap<>();
         for (CourseDto course : request.getCourses()) {
             capacities.put(course.getId(), course.getCapacity());
         }
 
-        // 2. Shuffle students for randomness
         List<StudentDto> students = new ArrayList<>(request.getStudents());
         Collections.shuffle(students);
 
         for (StudentDto student : students) {
-            // Assign to the first available course found
             for (CourseDto course : request.getCourses()) {
                 if (capacities.get(course.getId()) > 0) {
                     results.add(new MatchingResponseDto(
@@ -69,7 +66,7 @@ public class MatchingService {
                             course.getId(), course.getName()
                     ));
                     capacities.put(course.getId(), capacities.get(course.getId()) - 1);
-                    break; // Student assigned, move to next student
+                    break;
                 }
             }
         }

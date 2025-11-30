@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS assignments;
 DROP TABLE IF EXISTS grades;
 DROP TABLE IF EXISTS instructor_preferences;
 DROP TABLE IF EXISTS preferences;
@@ -104,6 +105,16 @@ CREATE TABLE instructor_preferences (
                                         CONSTRAINT fk_ip_optional FOREIGN KEY(optional_course_id) REFERENCES courses(id) ON DELETE CASCADE,
                                         CONSTRAINT fk_ip_compulsory FOREIGN KEY(compulsory_course_id) REFERENCES courses(id) ON DELETE CASCADE,
 
-    -- An optional course can only have one weight for a specific compulsory course
+    --only 1 weight for a specific compulsory course
                                         CONSTRAINT uk_ip_courses UNIQUE (optional_course_id, compulsory_course_id)
+);
+
+CREATE TABLE assignments (
+                             id BIGSERIAL PRIMARY KEY,
+                             student_id BIGINT NOT NULL,
+                             course_id BIGINT NOT NULL,
+
+                             CONSTRAINT fk_assignment_student FOREIGN KEY(student_id) REFERENCES students(id) ON DELETE CASCADE,
+                             CONSTRAINT fk_assignment_course FOREIGN KEY(course_id) REFERENCES courses(id) ON DELETE CASCADE,
+                             CONSTRAINT uk_assignment_student UNIQUE (student_id) -- only 1 optional course assignment
 );
