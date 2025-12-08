@@ -6,6 +6,9 @@ import com.example.lab04.repository.*;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -13,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import io.micrometer.core.instrument.Timer;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -30,6 +34,22 @@ public class MatchingClientService {
     private final InstructorPreferenceRepository instructorPreferenceRepository;
     private final RestTemplate restTemplate;
     private final AssignmentRepository assignmentRepository;
+
+    private final MeterRegistry meterRegistry;
+
+    private Counter invocationCounter;
+    private Timer executionTimer;
+
+    @PostConstruct
+    public void initMetrics() {
+        invocationCounter = Counter.builder("stable_match.invocations")
+                .description("Number of times the StableMatch algorithm was invoked")
+                .register(meterRegistry);
+
+        executionTimer = Timer.builder("stable_match.response_time")
+                .description("Time taken for StableMatch service to respond")
+                .register(meterRegistry);
+    }
 
     @Retry(name = "matchingService")
     @CircuitBreaker(name = "matchingService")
@@ -71,7 +91,13 @@ public class MatchingClientService {
 
             String url = "http://localhost:8084/api/solver/match/random";
             log.info("Sending request to StableMatch...");
+            invocationCounter.increment();
+
+            Timer.Sample sample = Timer.start(meterRegistry);
+
             SolverResponseDto[] response = restTemplate.postForObject(url, entity, SolverResponseDto[].class);
+
+            sample.stop(executionTimer);
 
             List<SolverResponseDto> results = response != null ? Arrays.asList(response) : Collections.emptyList();
 
