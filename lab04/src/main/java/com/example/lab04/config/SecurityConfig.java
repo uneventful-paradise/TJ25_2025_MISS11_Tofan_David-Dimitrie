@@ -63,6 +63,7 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                         .requestMatchers("/actuator/metrics/stable_match.invocations").permitAll()
                         .requestMatchers("/actuator/metrics/stable_match.response_time").permitAll()
+                        .requestMatchers("/actuator/prometheus").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/students/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/students/**").hasRole("ADMIN")

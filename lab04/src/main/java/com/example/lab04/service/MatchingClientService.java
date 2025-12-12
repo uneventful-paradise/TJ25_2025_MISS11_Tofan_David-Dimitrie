@@ -89,7 +89,8 @@ public class MatchingClientService {
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<SolverRequestDto> entity = new HttpEntity<>(request, headers);
 
-            String url = "http://localhost:8084/api/solver/match/random";
+//            String url = "http://localhost:8084/api/solver/match/random";
+            String url = "http://stable-match/api/solver/match/random";
             log.info("Sending request to StableMatch...");
             invocationCounter.increment();
 

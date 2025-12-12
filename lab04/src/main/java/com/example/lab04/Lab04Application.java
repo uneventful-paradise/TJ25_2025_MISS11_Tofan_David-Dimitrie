@@ -1,6 +1,8 @@
 package com.example.lab04;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 import com.example.lab04.service.CourseService;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 
 @SpringBootApplication
+@EnableDiscoveryClient
 @OpenAPIDefinition(info = @Info(title = "E-Learning API", version = "1.0",
         description = "API for managing Students, Courses, and Preferences"))
 public class Lab04Application {
@@ -33,6 +36,7 @@ public class Lab04Application {
     }
 
     @Bean
+    @LoadBalanced
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
