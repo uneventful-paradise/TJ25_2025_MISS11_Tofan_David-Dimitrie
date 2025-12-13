@@ -1,5 +1,5 @@
 server:
-  port: 8086 # The new public entry point
+  port: 8086
 
 spring:
   application:
@@ -8,7 +8,7 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: true # Auto-create routes based on service names
+          enabled: true
           lower-case-service-id: true
       routes:
         - id: stable-match-route
