@@ -28,4 +28,7 @@ public class StudentRequestDto {
 
     @NotNull(message = "Pack ID is required")
     private Long packId;
+
+    @NotNull(message = "Student GPA is required")
+    private Double gpa;
 }

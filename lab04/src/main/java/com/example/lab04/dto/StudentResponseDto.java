@@ -11,4 +11,5 @@ public class StudentResponseDto {
     private Integer year;
     private Long packId;
     private String packName;
+    private String status;
 }

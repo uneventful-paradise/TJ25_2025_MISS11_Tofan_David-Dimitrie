@@ -6,10 +6,12 @@ import com.example.lab04.Student;
 import com.example.lab04.User;
 import com.example.lab04.dto.StudentRequestDto;
 import com.example.lab04.dto.StudentResponseDto;
+import com.example.lab04.dto.VerificationRequestEvent;
 import com.example.lab04.exception.ResourceNotFoundException;
 import com.example.lab04.repository.PackRepository;
 import com.example.lab04.repository.StudentRepository;
 import com.example.lab04.repository.UserRepository;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,13 +28,15 @@ public class StudentService {
     private final PackRepository packRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RabbitTemplate rabbitTemplate;
 
     public StudentService(StudentRepository studentRepository, PackRepository packRepository,
-                          UserRepository userRepository, PasswordEncoder passwordEncoder) {
+                          UserRepository userRepository, PasswordEncoder passwordEncoder, RabbitTemplate rabbitTemplate) {
         this.studentRepository = studentRepository;
         this.packRepository = packRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
 //    public StudentService(StudentRepository studentRepository) {
@@ -69,7 +73,18 @@ public class StudentService {
                 dto.getYear(),
                 pack
         );
+        student.setGpa(dto.getGpa());
+        student.setStatus("PENDING");
         Student savedStudent = studentRepository.save(student);
+
+        VerificationRequestEvent event = new VerificationRequestEvent(
+                savedStudent.getId(),
+                savedStudent.getUser().getName(),
+                savedStudent.getGpa() // or GPA, depending on what you need
+        );
+
+        // 4. Send to RabbitMQ
+        rabbitTemplate.convertAndSend("saga_exchange", "verification.request", event);
 
         return mapToResponseDto(savedStudent);
     }
@@ -83,6 +98,7 @@ public class StudentService {
         dto.setYear(student.getYear());
         dto.setPackId(student.getPack().getId());
         dto.setPackName(student.getPack().getName());
+        dto.setStatus(student.getStatus());
         return dto;
     }
 

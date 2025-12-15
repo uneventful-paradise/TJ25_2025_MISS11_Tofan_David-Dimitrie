@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
-
     public static final String QUEUE = "grades_queue";
     public static final String EXCHANGE = "grades_exchange";
     public static final String ROUTING_KEY = "grades_routingKey";
@@ -20,7 +19,7 @@ public class RabbitMQConfig {
     public static final String DLQ_ROUTING_KEY = "grades_dlk";
 
     @Bean
-    public Queue queue() {
+    public Queue gradesQueue() { // Renamed from queue()
         return QueueBuilder.durable(QUEUE)
                 .withArgument("x-dead-letter-exchange", DLQ_EXCHANGE)
                 .withArgument("x-dead-letter-routing-key", DLQ_ROUTING_KEY)
@@ -28,29 +27,50 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public TopicExchange exchange() {
+    public TopicExchange gradesExchange() {
         return new TopicExchange(EXCHANGE);
     }
 
     @Bean
-    public Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY);
+    public Binding gradesBinding(Queue gradesQueue, TopicExchange gradesExchange) {
+        return BindingBuilder.bind(gradesQueue).to(gradesExchange).with(ROUTING_KEY);
+    }
+
+    @Bean public Queue gradesDlq() { return new Queue(DLQ_QUEUE); }
+    @Bean public TopicExchange gradesDlqExchange() { return new TopicExchange(DLQ_EXCHANGE); }
+    @Bean public Binding gradesDlqBinding() {
+        return BindingBuilder.bind(gradesDlq()).to(gradesDlqExchange()).with(DLQ_ROUTING_KEY);
     }
 
     @Bean
-    public Queue dlq() {
-        return new Queue(DLQ_QUEUE);
+    public Queue verificationRequestQueue() {
+        return new Queue("verification_queue");
     }
 
     @Bean
-    public TopicExchange dlqExchange() {
-        return new TopicExchange(DLQ_EXCHANGE);
+    public Queue verificationResultQueue() {
+        return new Queue("result_queue");
     }
 
     @Bean
-    public Binding dlqBinding() {
-        return BindingBuilder.bind(dlq()).to(dlqExchange()).with(DLQ_ROUTING_KEY);
+    public TopicExchange sagaExchange() {
+        return new TopicExchange("saga_exchange");
     }
+
+    @Bean
+    public Binding requestBinding(Queue verificationRequestQueue, TopicExchange sagaExchange) {
+        return BindingBuilder.bind(verificationRequestQueue)
+                .to(sagaExchange)
+                .with("verification.request");
+    }
+
+    @Bean
+    public Binding resultBinding(Queue verificationResultQueue, TopicExchange sagaExchange) {
+        return BindingBuilder.bind(verificationResultQueue)
+                .to(sagaExchange)
+                .with("verification.result");
+    }
+
 
     @Bean
     public MessageConverter converter() {

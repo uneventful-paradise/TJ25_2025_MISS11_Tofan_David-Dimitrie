@@ -29,6 +29,12 @@ public class Student {
     @JoinColumn(name = "pack_id")
     private Pack pack;
 
+    @Column(name = "status")
+    private String status = "PENDING";
+
+    @Column(name = "gpa")
+    private Double gpa;
+
     public Student(User user, String code, Integer year, Pack pack) {
         this.user = user;
         this.code = code;

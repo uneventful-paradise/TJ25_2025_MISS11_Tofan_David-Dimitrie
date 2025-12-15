@@ -31,6 +31,8 @@ CREATE TABLE students (
                           code VARCHAR(50) UNIQUE NOT NULL,
                           year INT NOT NULL,
                           pack_id BIGINT,
+                          status VARCHAR(50) DEFAULT 'PENDING',
+                          gpa DOUBLE PRECISION,
 
                           CONSTRAINT fk_student_user
                               FOREIGN KEY(user_id)
