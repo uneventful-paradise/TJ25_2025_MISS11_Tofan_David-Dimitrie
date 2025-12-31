@@ -1,4 +1,4 @@
--- The Write Model: Stores every event
+-- store events
 CREATE TABLE IF NOT EXISTS event_store (
    id SERIAL PRIMARY KEY,
    aggregate_id VARCHAR(255) NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS event_store (
     version INT NOT NULL
     );
 
--- Optimization: Stores state at specific versions
+-- state at specific version
 CREATE TABLE IF NOT EXISTS snapshots (
     id SERIAL PRIMARY KEY,
     aggregate_id VARCHAR(255) NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS snapshots (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
--- The Read Model: Queryable view of accounts
+-- read model
 CREATE TABLE IF NOT EXISTS account_view (
     account_id VARCHAR(255) PRIMARY KEY,
     owner VARCHAR(255),
