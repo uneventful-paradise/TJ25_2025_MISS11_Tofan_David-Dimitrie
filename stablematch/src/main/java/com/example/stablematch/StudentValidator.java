@@ -17,7 +17,7 @@ public class StudentValidator {
         System.out.println("Validating student: " + event.getName());
 
         boolean approved = event.getGpa() != null && event.getGpa() >= 5.0;
-        String reason = approved ? "Good academic standing" : "GPA too low";
+        String reason = approved ? "Good GPA" : "GPA too low";
 
         VerificationResultEvent result = new VerificationResultEvent(
                 event.getStudentId(), approved, reason

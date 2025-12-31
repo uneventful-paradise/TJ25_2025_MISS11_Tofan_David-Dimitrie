@@ -80,10 +80,9 @@ public class StudentService {
         VerificationRequestEvent event = new VerificationRequestEvent(
                 savedStudent.getId(),
                 savedStudent.getUser().getName(),
-                savedStudent.getGpa() // or GPA, depending on what you need
+                savedStudent.getGpa()
         );
 
-        // 4. Send to RabbitMQ
         rabbitTemplate.convertAndSend("saga_exchange", "verification.request", event);
 
         return mapToResponseDto(savedStudent);
