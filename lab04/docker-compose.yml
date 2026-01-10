@@ -30,6 +30,26 @@ services:
       - prometheus
     volumes:
       - grafana-storage:/var/lib/grafana
+  app:
+    build: .
+    container_name: lab04-app
+    ports:
+      - "8082:8082"
+    depends_on:
+      - rabbitmq
+    environment:
+      # Connect to RabbitMQ inside Docker
+      SPRING_RABBITMQ_HOST: rabbitmq
 
+      # Connect to Postgres on your HOST computer
+      # URL format: jdbc:postgresql://host.docker.internal:<YOUR_PORT>/studentdb
+      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5433/studentdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1234
+
+    # REQUIRED for Linux users (optional but harmless for Windows/Mac)
+    # This maps 'host.docker.internal' to the actual host gateway IP
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 volumes:
   grafana-storage:
