@@ -3,7 +3,7 @@ name: Lab04 CI with Maven
 on:
   push:
     branches: [ "main" ]
-    paths:             # OPTIONAL: Only run this when files in lab04 change
+    paths:             
       - 'lab04/**'
       - '.github/workflows/maven.yml'
   pull_request:
@@ -25,10 +25,8 @@ jobs:
           distribution: 'temurin'
           cache:maven: true
 
-      # FIX: Tell Maven exactly where the pom.xml is
       - name: Build with Maven
         run: mvn -B package --file lab04/pom.xml
 
-      # FIX: Tell Docker where the build context (lab04 folder) and Dockerfile are
       - name: Build Docker Image
         run: docker build lab04 --file lab04/Dockerfile --tag lab04-app:latest

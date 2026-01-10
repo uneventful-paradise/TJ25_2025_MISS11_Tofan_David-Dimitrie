@@ -41,29 +41,4 @@ public class Lab04Application {
         return new RestTemplate();
     }
 
-    @Bean
-    public CommandLineRunner runFakerDemo(
-            CourseService courseService,
-            InstructorService instructorService,
-            PackService packService,
-            StudentService studentService
-    ) {
-        return (args) -> {
-            runDemo(courseService, instructorService, packService, studentService);
-
-        };
-
-    }
-
-    @Transactional
-    public void runDemo(CourseService courseService, InstructorService instructorService, PackService packService, StudentService studentService) {
-        log.info("\nSTARTING DEMO\n");
-        courseService.deleteAll();
-        packService.deleteAll();
-        instructorService.deleteAll();
-        studentService.deleteAll();
-        log.info("cleared repo info");
-
-        log.info("\nDEMO FINISHED\n");
-    }
 }
